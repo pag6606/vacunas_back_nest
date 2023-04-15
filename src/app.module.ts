@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CatalogueModule } from './catalogues/catalogue.module';
+import { VaccinationRegistryModule } from './vaccination-registry/vaccination-registry.module';
 
 @Module({
   imports: [
@@ -10,11 +10,11 @@ import { CatalogueModule } from './catalogues/catalogue.module';
       port: 5432,
       username: 'postgres',
       password: '123456',
-      database: 'db_test',
+      database: 'vaccination_inventory',
       synchronize: false,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
     }),
-    CatalogueModule,
+    VaccinationRegistryModule,
   ],
 })
 export class AppModule {}
