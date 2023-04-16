@@ -58,3 +58,17 @@ CREATE TABLE vaccination_registry.user (
     created_date DATE,
     last_modified_date DATE
 );
+
+INSERT INTO vaccination_registry.vaccine
+(id, vaccine_type, status, created_date, last_modified_date)
+VALUES(1, 'AstraZeneca', '1', '2023-04-16', NULL);
+INSERT INTO vaccination_registry.vaccine
+(id, vaccine_type, status, created_date, last_modified_date)
+VALUES(2, 'Jhonson&Jhonson', '1', '2023-04-16', NULL);
+INSERT INTO vaccination_registry.vaccine
+(id, vaccine_type, status, created_date, last_modified_date)
+VALUES(3, 'Pfizer', '1', '2023-04-16', NULL);
+INSERT INTO vaccination_registry.vaccine
+(id, vaccine_type, status, created_date, last_modified_date)
+VALUES(4, 'Sputnik', '1', '2023-04-16', NULL);
+

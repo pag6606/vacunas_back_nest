@@ -19,7 +19,7 @@ export class PersonEntity {
   @Column({ name: 'last_name', type: 'varchar', nullable: false })
   lastName: string;
 
-  @Column({ name: 'ssn', type: 'numeric', unique: true, nullable: false })
+  @Column({ name: 'dni', type: 'numeric', unique: true, nullable: false })
   dni: number;
 
   @Column({ name: 'status', type: 'varchar', nullable: false, default: '1' })

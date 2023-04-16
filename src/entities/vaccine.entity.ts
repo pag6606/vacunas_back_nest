@@ -10,6 +10,8 @@ import { EmployeeVaccinationEntity } from './employee-vaccination.entity';
 
 @Entity('vaccination_registry.vaccine')
 export class VaccineEntity {
+  static ALIAS = 'vaccine';
+
   @PrimaryGeneratedColumn({ name: 'id', type: 'integer' })
   id: number;
 

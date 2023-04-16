@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { VaccinationRegistryModule } from './vaccination-registry/vaccination-registry.module';
+import { EmployeeModule } from './employees/employee.module';
+import { UserModule } from './users/user.module';
+import { VaccineModule } from './vaccines/vaccine.module';
 
 @Module({
   imports: [
@@ -14,7 +16,9 @@ import { VaccinationRegistryModule } from './vaccination-registry/vaccination-re
       synchronize: false,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
     }),
-    VaccinationRegistryModule,
+    EmployeeModule,
+    UserModule,
+    VaccineModule,
   ],
 })
 export class AppModule {}
