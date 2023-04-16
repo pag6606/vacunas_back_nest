@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmployeeService } from './services';
 import { EmployeeEntity } from '../entities';
 import { EmployeeController } from './controllers';
-import { PersonModule } from '../persons/person.module';
+import { PersonModule } from '../people/person.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([EmployeeEntity]), PersonModule],

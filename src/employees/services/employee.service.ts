@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EmployeeEntity, PersonEntity } from '../../entities';
 import { Status } from '../../constants/app.constant';
 import { CreateEmployeeDto } from '../dto/create-employee.dto';
-import { PersonService } from '../../persons/services';
+import { PersonService } from '../../people/services';
 
 /**
  * Service to Employee
