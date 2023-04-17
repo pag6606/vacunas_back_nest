@@ -6,8 +6,10 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { EmployeeEntity } from './employee.entity';
+import { UserRoleEntity } from './user-role.entity';
 
 @Entity('vaccination_registry.user')
 export class UserEntity {
@@ -26,9 +28,6 @@ export class UserEntity {
   @Column({ name: 'password', type: 'varchar' })
   password: string;
 
-  @Column({ name: 'role', type: 'varchar' })
-  role: string;
-
   @Column({ name: 'status', type: 'varchar', default: '1' })
   status: string;
 
@@ -37,4 +36,7 @@ export class UserEntity {
 
   @UpdateDateColumn({ name: 'last_modified_date', type: 'date' })
   lastModifiedDate: Date;
+
+  @OneToMany(() => UserRoleEntity, (userRole) => userRole.user)
+  userRoles: UserRoleEntity[];
 }

@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { PersonEntity } from '../../entities';
+import { Status } from '../../constants';
 
 /**
  * Service to Person
@@ -16,6 +17,15 @@ export class PersonService {
     @InjectRepository(PersonEntity)
     private _personRepository: Repository<PersonEntity>,
   ) {}
+
+  async getPerson(dni: number) {
+    const alias = PersonEntity.ALIAS;
+    return await this._personRepository
+      .createQueryBuilder(alias)
+      .where(`${alias}.status =:status`, { status: Status.Active })
+      .andWhere(`${alias}.dni =:dni`, { dni })
+      .getOne();
+  }
 
   async createPerson(person: PersonEntity): Promise<PersonEntity> {
     return await this._personRepository.save(person);

@@ -50,4 +50,8 @@ export class CreateEmployeeDto {
   @IsOptional()
   @IsBoolean()
   vaccinationStatus: boolean;
+
+  @IsNotEmpty()
+  @IsString()
+  role: string;
 }

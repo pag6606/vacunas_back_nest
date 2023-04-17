@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { EmployeeService } from '../services/employee.service';
 import { EmployeeEntity } from '../../entities';
 import { CreateEmployeeDto } from '../dto/create-employee.dto';
+import { CreateEmployee } from '../model/create-employee.interface';
 
 @Controller('/employees')
 export class EmployeeController {
@@ -15,7 +16,7 @@ export class EmployeeController {
   @Post('/create')
   async CreateEmploye(
     @Body() createEmployee: CreateEmployeeDto,
-  ): Promise<EmployeeEntity> {
+  ): Promise<CreateEmployee> {
     return await this._employeeService.createEmploye(createEmployee);
   }
 }

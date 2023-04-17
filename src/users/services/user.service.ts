@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 
 import { UserEntity } from '../../entities';
 import { Status } from '../../constants';
@@ -36,14 +37,15 @@ export class UserService {
       .getOne();
   }
 
-  async createUserFromProfile(profile: any): Promise<UserEntity> {
-    const newUser = new UserEntity();
-    newUser.username = profile.emails[0].value;
-    newUser.role = profile.displayName;
+  async createUser(user: UserEntity): Promise<UserEntity> {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+    user.password = hashedPassword;
 
-    // Establezca otros valores de usuario según su lógica, como roles y contraseñas predeterminadas, si corresponde
-
-    const savedUser = await this._userRepository.save(newUser);
-    return savedUser;
+    /* async function validatePassword(providedPassword, storedPassword) {
+      const isValid = await bcrypt.compare(providedPassword, storedPassword);
+      return isValid;
+    } */
+    return await this._userRepository.save(user);
   }
 }
