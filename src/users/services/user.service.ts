@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { UserEntity } from '../../entities';
 import { Status } from '../../constants';
+import { UserException } from '../../errors/user.error';
 
 /**
  * Service to User
@@ -24,17 +25,31 @@ export class UserService {
     return await this._userRepository
       .createQueryBuilder(alias)
       .where(`${alias}.status = '${Status.Active}'`)
-      .andWhere(`${alias}.username = '${username}'`)
+      .andWhere(`${alias}.username =:username`, { username })
       .getOne();
   }
 
-  async getUserByEmail(email: string): Promise<UserEntity> {
-    const alias = UserEntity.ALIAS;
-    return await this._userRepository
-      .createQueryBuilder(alias)
-      .where(`${alias}.status = '${Status.Active}'`)
-      .andWhere(`${alias}.email = '${email}'`)
-      .getOne();
+  async validatePassword(
+    providedPassword: string,
+    storedPassword: string,
+  ): Promise<boolean> {
+    return await bcrypt.compare(providedPassword, storedPassword);
+  }
+
+  async loginUser(username: string, providedPassword: string) {
+    const user = await this.getUser(username);
+
+    if (!user) throw new UserException('user-valid', HttpStatus.BAD_REQUEST);
+
+    const isValid = await this.validatePassword(
+      providedPassword,
+      user?.password,
+    );
+
+    if (!isValid)
+      throw new UserException('username-password', HttpStatus.BAD_REQUEST);
+
+    return user;
   }
 
   async createUser(user: UserEntity): Promise<UserEntity> {
@@ -42,10 +57,6 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(user.password, saltRounds);
     user.password = hashedPassword;
 
-    /* async function validatePassword(providedPassword, storedPassword) {
-      const isValid = await bcrypt.compare(providedPassword, storedPassword);
-      return isValid;
-    } */
     return await this._userRepository.save(user);
   }
 }

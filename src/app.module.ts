@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmployeeModule } from './employees/employee.module';
 import { UserModule } from './users/user.module';
 import { VaccineModule } from './vaccines/vaccine.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ResponseInterceptor } from './interceptors';
 
 @Module({
   imports: [
@@ -19,6 +21,12 @@ import { VaccineModule } from './vaccines/vaccine.module';
     EmployeeModule,
     UserModule,
     VaccineModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
   ],
 })
 export class AppModule {}

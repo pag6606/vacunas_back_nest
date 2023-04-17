@@ -1,4 +1,4 @@
-export function validateID(dni: string): boolean {
+export async function validateID(dni: string): Promise<boolean> {
   if (dni.length !== 10) {
     return false;
   }

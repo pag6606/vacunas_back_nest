@@ -15,6 +15,8 @@ import { UserService } from '../../users/services';
 import { RoleService } from '../../roles/services';
 import { UserRoleService } from '../../user-roles/services';
 import { CreateEmployee } from '../model/create-employee.interface';
+import { validateID } from '../../utils/validateiD';
+import { EmployeeException } from '../../errors/employee.error';
 
 /**
  * Service to Employee
@@ -72,29 +74,19 @@ export class EmployeeService {
     createEmployee: CreateEmployeeDto,
   ): Promise<CreateEmployee> {
     const existPerson = await this._personService.getPerson(createEmployee.dni);
-    const existEmploye = await this.getEmployee(createEmployee.email);
+    const existEmailEmploye = await this.getEmployee(createEmployee.email);
+    const isValidDni = validateID(String(createEmployee.dni));
     const role = await this._roleService.getRole(createEmployee.role);
     const currentDay = new Date();
 
-    if (existPerson) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: 'The DNI you are trying to register already exists',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    if (existPerson)
+      throw new EmployeeException('dni-person', HttpStatus.BAD_REQUEST);
 
-    if (existEmploye) {
-      throw new HttpException(
-        {
-          status: HttpStatus.BAD_REQUEST,
-          error: 'The email you are trying to register already exists',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    if (existEmailEmploye)
+      throw new EmployeeException('employee-email', HttpStatus.BAD_REQUEST);
+
+    if (!isValidDni)
+      throw new EmployeeException('dni-valid', HttpStatus.BAD_REQUEST);
 
     const person = new PersonEntity();
     person.dni = createEmployee.dni;
