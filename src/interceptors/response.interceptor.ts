@@ -14,7 +14,6 @@ interface Response<T> {
   message: string;
   data: T;
 }
-
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
   intercept(
@@ -24,29 +23,33 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
     const request = context.switchToHttp().getRequest();
 
     return next.handle().pipe(
-      map((data) => {
+      map((response) => {
         let message: string;
         const statusCode = context.switchToHttp().getResponse().statusCode;
 
-        switch (request.method) {
-          case 'POST':
-            message = 'Created';
-            break;
-          case 'PUT':
-          case 'PATCH':
-            message = 'Updated';
-            break;
-          case 'DELETE':
-            message = 'Deleted';
-            break;
-          default:
-            message = 'Success';
+        if (response && response.message) {
+          message = response.message;
+        } else {
+          switch (request.method) {
+            case 'POST':
+              message = 'Created';
+              break;
+            case 'PUT':
+            case 'PATCH':
+              message = 'Updated';
+              break;
+            case 'DELETE':
+              message = 'Deleted';
+              break;
+            default:
+              message = 'Success';
+          }
         }
 
         return {
           statusCode,
           message,
-          data,
+          data: response.data || response,
         };
       }),
     );

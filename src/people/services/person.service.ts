@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { PersonEntity } from '../../entities';
@@ -29,5 +29,12 @@ export class PersonService {
 
   async createPerson(person: PersonEntity): Promise<PersonEntity> {
     return await this._personRepository.save(person);
+  }
+
+  async updatePerson(
+    personId: number,
+    person: PersonEntity,
+  ): Promise<UpdateResult> {
+    return await this._personRepository.update(personId, person);
   }
 }

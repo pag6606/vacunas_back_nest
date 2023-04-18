@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 
@@ -58,5 +58,9 @@ export class UserService {
     user.password = hashedPassword;
 
     return await this._userRepository.save(user);
+  }
+
+  async updateuser(userId: number, user: UserEntity): Promise<UpdateResult> {
+    return await this._userRepository.update(userId, user);
   }
 }

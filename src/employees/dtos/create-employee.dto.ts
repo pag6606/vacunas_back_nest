@@ -8,6 +8,7 @@ import {
   IsDate,
   IsPhoneNumber,
   IsBoolean,
+  IsDateString,
 } from 'class-validator';
 
 export class CreateEmployeeDto {
@@ -36,7 +37,7 @@ export class CreateEmployeeDto {
   email: string;
 
   @IsOptional()
-  @IsDate()
+  @IsDateString()
   birthDate: Date;
 
   @IsOptional()

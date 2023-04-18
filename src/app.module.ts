@@ -5,6 +5,7 @@ import { UserModule } from './users/user.module';
 import { VaccineModule } from './vaccines/vaccine.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './interceptors';
+import { EmployeeVaccinationModule } from './employee-vaccinations/employee-vaccination.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ResponseInterceptor } from './interceptors';
     EmployeeModule,
     UserModule,
     VaccineModule,
+    EmployeeVaccinationModule,
   ],
   providers: [
     {

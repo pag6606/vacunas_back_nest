@@ -28,4 +28,14 @@ export class VaccineService {
       .orderBy(`${alias}.vaccineType`, 'ASC')
       .getMany();
   }
+
+  async getVaccine(vaccineId: number): Promise<VaccineEntity> {
+    this._logger.log(Status.Active);
+    const alias = VaccineEntity.ALIAS;
+    return await this._vaccineRepository
+      .createQueryBuilder(alias)
+      .where(`${alias}.status = :status`, { status: Status.Active })
+      .andWhere(`${alias}.id = :vaccineId`, { vaccineId })
+      .getOne();
+  }
 }

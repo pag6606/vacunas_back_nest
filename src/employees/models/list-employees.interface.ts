@@ -1,12 +1,14 @@
-interface VaccinationStatus {
+interface Role {
   id: number;
   name: string;
 }
 
-interface DoseNumber {
+interface Vaccine {
   id: number;
   name: string;
   doseNumber: number;
+  vaccinationDate: Date;
+  employeeVaccinationId: number;
 }
 
 export interface Employee {
@@ -20,6 +22,7 @@ export interface Employee {
   status: string;
   username: string;
   password: string;
-  vaccine: boolean;
-  vaccinationStatus: VaccinationStatus[];
+  vaccinationStatus: boolean;
+  vaccines: Vaccine[];
+  roles: Role[];
 }
