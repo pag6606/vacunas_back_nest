@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 
 import {
   EmployeeEntity,
@@ -397,7 +398,13 @@ export class EmployeeService {
       await this._personService.updatePerson(findEmployee.person?.id, person);
 
       const user = new UserEntity();
-      user.password = updateEmployee.password;
+
+      if (updateEmployee.password) {
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+        user.password = hashedPassword;
+      }
+
       user.username = updateEmployee.email
         ? updateEmployee.email
         : updateEmployee.username;
