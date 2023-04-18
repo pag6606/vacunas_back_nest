@@ -17,6 +17,7 @@ import { UserRoleService } from '../../user-roles/services';
 import { CreateEmployee } from '../model/create-employee.interface';
 import { validateID } from '../../utils/validateiD';
 import { EmployeeException } from '../../errors/employee.error';
+import { Employee } from '../model/list-employees.interface';
 
 /**
  * Service to Employee
@@ -39,8 +40,77 @@ export class EmployeeService {
     const alias = EmployeeEntity.ALIAS;
     return await this._employeeRepository
       .createQueryBuilder(alias)
+      .leftJoinAndSelect(`${alias}.user`, 'user', 'user.status =:status', {
+        status: Status.Active,
+      })
+      .leftJoinAndSelect(
+        `${alias}.employeeVaccinations`,
+        'employeeVaccinations',
+        'employeeVaccinations.status =:status',
+        {
+          status: Status.Active,
+        },
+      )
+      .leftJoinAndSelect(
+        `${alias}.person`,
+        'person',
+        'person.status =:status',
+        {
+          status: Status.Active,
+        },
+      )
+      .leftJoinAndSelect(
+        'user.userRoles',
+        'userRoles',
+        'userRoles.status =:status',
+        {
+          status: Status.Active,
+        },
+      )
+      .leftJoinAndSelect('userRoles.role', 'role', 'role.status =:status', {
+        status: Status.Active,
+      })
       .where(`${alias}.status =:status`, { status: Status.Active })
       .getMany();
+  }
+
+  async mapEmployees(employees: EmployeeEntity[]): Promise<Employee[]> {
+    return employees.map((employee) => {
+      return {
+        id: employee.id,
+        dni: employee.person.dni,
+        firstName: employee.person?.firstName,
+        lastName: employee.person?.lastName,
+        birthDate: employee.birthDate,
+        homeAddress: employee.homeAddress,
+        mobilePhone: employee.mobilePhone,
+        status: employee.status === Status.Active ? 'Active' : 'Inactive',
+        username: employee.user?.username,
+        password: employee.user?.password,
+        vaccine: employee.vaccinationStatus,
+        vaccinationStatus:
+          employee.user?.userRoles?.length > 0
+            ? employee.user?.userRoles.map((userRole) => {
+                return { id: userRole.role?.id, name: userRole.role?.name };
+              })
+            : null,
+        vaccines:
+          employee.employeeVaccinations?.length > 0
+            ? employee.employeeVaccinations?.map((employeeVaccination) => {
+                return {
+                  id: employeeVaccination.vaccine?.id,
+                  name: employeeVaccination.vaccine?.vaccineType,
+                  doseNumber: employeeVaccination.doseNumber,
+                };
+              })
+            : null,
+      };
+    });
+  }
+
+  async listEmployees(): Promise<Employee[]> {
+    const employees = await this.getEmployees();
+    return await this.mapEmployees(employees);
   }
 
   async getEmployee(email: string): Promise<EmployeeEntity> {
@@ -58,6 +128,7 @@ export class EmployeeService {
   ): Promise<CreateEmployee> {
     return {
       id: employee.id,
+      dni: employee.person.dni,
       firstName: employee.person?.firstName,
       lastName: employee.person?.lastName,
       birthDate: employee.birthDate,
@@ -80,13 +151,13 @@ export class EmployeeService {
     const currentDay = new Date();
 
     if (existPerson)
-      throw new EmployeeException('dni-person', HttpStatus.BAD_REQUEST);
+      throw new EmployeeException('dni-exist', HttpStatus.BAD_REQUEST);
 
     if (existEmailEmploye)
-      throw new EmployeeException('employee-email', HttpStatus.BAD_REQUEST);
+      throw new EmployeeException('email-exist', HttpStatus.BAD_REQUEST);
 
     if (!isValidDni)
-      throw new EmployeeException('dni-valid', HttpStatus.BAD_REQUEST);
+      throw new EmployeeException('invalid-dni', HttpStatus.BAD_REQUEST);
 
     const person = new PersonEntity();
     person.dni = createEmployee.dni;

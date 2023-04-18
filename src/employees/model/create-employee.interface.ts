@@ -1,5 +1,6 @@
 export interface CreateEmployee {
   id: number;
+  dni: number;
   firstName: string | null;
   lastName: string | null;
   birthDate: Date;

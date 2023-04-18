@@ -5,9 +5,9 @@ interface HttpStatusMessageMap {
 }
 
 const statusMessages: HttpStatusMessageMap = {
-  ['dni-valid']: 'The DNI you are trying to register is not valid',
-  ['dni-person']: 'The DNI you are trying to register already exists',
-  ['employee-email']: 'The email you are trying to register already exists',
+  ['invalid-dni']: 'The DNI you are trying to register is not valid',
+  ['email-exist']: 'The email you are trying to register already exists',
+  ['dni-exist']: 'The DNI you are trying to register already exists',
 };
 
 export class EmployeeException extends HttpException {

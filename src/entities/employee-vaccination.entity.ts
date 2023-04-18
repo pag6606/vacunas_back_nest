@@ -15,7 +15,7 @@ export class EmployeeVaccinationEntity {
   @PrimaryGeneratedColumn({ name: 'id', type: 'integer' })
   id: number;
 
-  @ManyToOne(() => EmployeeEntity, (employee) => employee.employeeVaccination)
+  @ManyToOne(() => EmployeeEntity, (employee) => employee.employeeVaccinations)
   @JoinColumn({ name: 'employee_id' })
   employee: EmployeeEntity;
 

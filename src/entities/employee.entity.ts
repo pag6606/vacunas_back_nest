@@ -7,6 +7,7 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { PersonEntity } from './person.entity';
 import { UserEntity } from './user.entity';
@@ -50,9 +51,9 @@ export class EmployeeEntity {
   @OneToOne(() => UserEntity, (user) => user.employee)
   user: UserEntity;
 
-  @OneToOne(
+  @OneToMany(
     () => EmployeeVaccinationEntity,
     (employeeVaccination) => employeeVaccination.employee,
   )
-  employeeVaccination: EmployeeVaccinationEntity;
+  employeeVaccinations: EmployeeVaccinationEntity[];
 }
