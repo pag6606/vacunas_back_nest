@@ -4,10 +4,10 @@ import { VaccineEntity } from '../../entities';
 
 @Controller('/vaccines')
 export class VaccineController {
-  constructor(private readonly __vaccineService: VaccineService) {}
+  constructor(private readonly _vaccineService: VaccineService) {}
 
   @Get()
   async getVaccines(): Promise<VaccineEntity[]> {
-    return await this.__vaccineService.getVaccines();
+    return await this._vaccineService.getVaccines();
   }
 }
