@@ -6,6 +6,7 @@ async function bootstrap() {
   const logger = new Logger();
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors();
   app.setGlobalPrefix('vaccinationinventory/api/v1');
   await app.listen(3000);
   logger.log('Run in port 3000');
