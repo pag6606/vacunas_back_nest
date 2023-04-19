@@ -22,7 +22,8 @@ import { UserRoleService } from '../../user-roles/services';
 import { CreateEmployee } from '../models/create-employee.interface';
 import { validateID } from '../../utils/validateiD';
 import { EmployeeException } from '../../errors/employee.error';
-import { Employee } from '../models/list-employees.interface';
+import { EmployeeDto } from '../dtos/employee.dto';
+/* import { Employee } from '../models/list-employees.interface'; */
 
 /**
  * Service to Employee
@@ -143,42 +144,45 @@ export class EmployeeService {
     return await employees.getMany();
   }
 
-  async mapEmployees(employees: EmployeeEntity[]): Promise<Employee[]> {
+  async mapEmployees(employees: EmployeeEntity[]): Promise<EmployeeDto[]> {
     return employees.map((employee) => {
-      return {
-        id: employee.id,
-        dni: employee.person.dni,
-        firstName: employee.person?.firstName,
-        lastName: employee.person?.lastName,
-        birthDate: employee.birthDate,
-        homeAddress: employee.homeAddress,
-        mobilePhone: employee.mobilePhone,
-        status: employee.status === Status.Active ? 'Active' : 'Inactive',
-        username: employee.user?.username,
-        vaccinationStatus: employee.vaccinationStatus,
-        vaccines:
-          employee.employeeVaccinations?.length > 0
-            ? employee.employeeVaccinations?.map((employeeVaccination) => {
-                return {
-                  id: employeeVaccination.vaccine?.id,
-                  name: employeeVaccination.vaccine?.vaccineType,
-                  doseNumber: employeeVaccination.doseNumber,
-                  vaccinationDate: employeeVaccination.vaccinationDate,
-                  employeeVaccinationId: employeeVaccination.id,
-                };
-              })
-            : null,
-        roles:
-          employee.user?.userRoles?.length > 0
-            ? employee.user?.userRoles.map((userRole) => {
-                return { id: userRole.role?.id, name: userRole.role?.name };
-              })
-            : null,
-      };
+      const employeeDto = new EmployeeDto();
+
+      employeeDto.id = employee.id;
+      employeeDto.dni = employee.person.dni;
+      employeeDto.firstName = employee.person?.firstName;
+      employeeDto.lastName = employee.person?.lastName;
+      employeeDto.birthDate = employee.birthDate;
+      employeeDto.homeAddress = employee.homeAddress;
+      employeeDto.mobilePhone = employee.mobilePhone;
+      employeeDto.status =
+        employee.status === Status.Active ? 'Active' : 'Inactive';
+      employeeDto.username = employee.user?.username;
+      employeeDto.vaccinationStatus = employee.vaccinationStatus;
+      employeeDto.vaccines =
+        employee.employeeVaccinations?.length > 0
+          ? employee.employeeVaccinations?.map((employeeVaccination) => {
+              return {
+                id: employeeVaccination.vaccine?.id,
+                name: employeeVaccination.vaccine?.vaccineType,
+                doseNumber: employeeVaccination.doseNumber,
+                vaccinationDate: employeeVaccination.vaccinationDate,
+                employeeVaccinationId: employeeVaccination.id,
+              };
+            })
+          : null;
+      employeeDto.roles =
+        employee.user?.userRoles?.length > 0
+          ? employee.user?.userRoles.map((userRole) => {
+              return { id: userRole.role?.id, name: userRole.role?.name };
+            })
+          : null;
+
+      return employeeDto;
     });
   }
 
-  async listEmployees(filters?: FilterEmployeeDto): Promise<Employee[]> {
+  async listEmployees(filters?: FilterEmployeeDto): Promise<EmployeeDto[]> {
     const employees = await this.getEmployees(filters);
     return await this.mapEmployees(employees);
   }
@@ -237,38 +241,41 @@ export class EmployeeService {
     return await employee.getOne();
   }
 
-  async myInformation(dni: number): Promise<Employee> {
+  async myInformation(dni: number): Promise<EmployeeDto> {
     const employee = await this.getEmployee(dni);
-    return {
-      id: employee.id,
-      dni: employee.person.dni,
-      firstName: employee.person?.firstName,
-      lastName: employee.person?.lastName,
-      birthDate: employee.birthDate,
-      homeAddress: employee.homeAddress,
-      mobilePhone: employee.mobilePhone,
-      status: employee.status === Status.Active ? 'Active' : 'Inactive',
-      username: employee.user?.username,
-      vaccinationStatus: employee.vaccinationStatus,
-      vaccines:
-        employee.employeeVaccinations?.length > 0
-          ? employee.employeeVaccinations?.map((employeeVaccination) => {
-              return {
-                id: employeeVaccination.vaccine?.id,
-                name: employeeVaccination.vaccine?.vaccineType,
-                doseNumber: employeeVaccination.doseNumber,
-                vaccinationDate: employeeVaccination.vaccinationDate,
-                employeeVaccinationId: employeeVaccination.id,
-              };
-            })
-          : null,
-      roles:
-        employee.user?.userRoles?.length > 0
-          ? employee.user?.userRoles.map((userRole) => {
-              return { id: userRole.role?.id, name: userRole.role?.name };
-            })
-          : null,
-    };
+    const employeeDto = new EmployeeDto();
+
+    employeeDto.id = employee.id;
+    employeeDto.dni = employee.person.dni;
+    employeeDto.firstName = employee.person?.firstName;
+    employeeDto.lastName = employee.person?.lastName;
+    employeeDto.birthDate = employee.birthDate;
+    employeeDto.homeAddress = employee.homeAddress;
+    employeeDto.mobilePhone = employee.mobilePhone;
+    employeeDto.status =
+      employee.status === Status.Active ? 'Active' : 'Inactive';
+    employeeDto.username = employee.user?.username;
+    employeeDto.vaccinationStatus = employee.vaccinationStatus;
+    employeeDto.vaccines =
+      employee.employeeVaccinations?.length > 0
+        ? employee.employeeVaccinations?.map((employeeVaccination) => {
+            return {
+              id: employeeVaccination.vaccine?.id,
+              name: employeeVaccination.vaccine?.vaccineType,
+              doseNumber: employeeVaccination.doseNumber,
+              vaccinationDate: employeeVaccination.vaccinationDate,
+              employeeVaccinationId: employeeVaccination.id,
+            };
+          })
+        : null;
+    employeeDto.roles =
+      employee.user?.userRoles?.length > 0
+        ? employee.user?.userRoles.map((userRole) => {
+            return { id: userRole.role?.id, name: userRole.role?.name };
+          })
+        : null;
+
+    return employeeDto;
   }
 
   async mapCreateEmployee(

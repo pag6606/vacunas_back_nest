@@ -8,6 +8,7 @@ import { EmployeeService } from '../../employees/services';
 import { VaccineService } from '../../vaccines/services';
 import {
   CreateEmployeeVaccinationDto,
+  EmployeeVaccinationDto,
   UpdateEmployeeVaccinationDto,
 } from '../dtos';
 import { EmployeeVaccination } from '../models';
@@ -45,7 +46,7 @@ export class EmployeeVaccinationService {
 
   async createEmployeeVaccination(
     createEmployeeVaccination: CreateEmployeeVaccinationDto,
-  ): Promise<EmployeeVaccination> {
+  ): Promise<EmployeeVaccinationDto> {
     const { employeeId, vaccineId } = createEmployeeVaccination;
     const employee = await this._employeeService.getEmployee(
       null,
@@ -64,15 +65,18 @@ export class EmployeeVaccinationService {
     const savedEmployeeVaccination =
       await this._employeeVaccinationRepository.save(employeeVaccination);
 
-    return {
-      id: savedEmployeeVaccination.id,
-      employeeId: employee.id,
-      personId: employee.person.id,
-      vaccine: vaccine.vaccineType,
-      doseNumber: savedEmployeeVaccination.doseNumber,
-      vaccinationDate: savedEmployeeVaccination.vaccinationDate,
-      completeName: employee.person.firstName + ' ' + employee.person.lastName,
-    };
+    const employeeVaccinationResponse = new EmployeeVaccinationDto();
+    employeeVaccinationResponse.id = savedEmployeeVaccination.id;
+    employeeVaccinationResponse.employeeId = employee.id;
+    employeeVaccinationResponse.personId = employee.person.id;
+    employeeVaccinationResponse.vaccine = vaccine.vaccineType;
+    employeeVaccinationResponse.doseNumber =
+      savedEmployeeVaccination.doseNumber;
+    employeeVaccinationResponse.vaccinationDate =
+      savedEmployeeVaccination.vaccinationDate;
+    employeeVaccinationResponse.completeName =
+      employee.person.firstName + ' ' + employee.person.lastName;
+    return employeeVaccinationResponse;
   }
 
   async updateEmployeeVaccination(
