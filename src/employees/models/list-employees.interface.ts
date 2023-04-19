@@ -21,7 +21,6 @@ export interface Employee {
   mobilePhone: string;
   status: string;
   username: string;
-  password: string;
   vaccinationStatus: boolean;
   vaccines: Vaccine[];
   roles: Role[];

@@ -155,7 +155,6 @@ export class EmployeeService {
         mobilePhone: employee.mobilePhone,
         status: employee.status === Status.Active ? 'Active' : 'Inactive',
         username: employee.user?.username,
-        password: employee.user?.password,
         vaccinationStatus: employee.vaccinationStatus,
         vaccines:
           employee.employeeVaccinations?.length > 0
@@ -250,7 +249,6 @@ export class EmployeeService {
       mobilePhone: employee.mobilePhone,
       status: employee.status === Status.Active ? 'Active' : 'Inactive',
       username: employee.user?.username,
-      password: employee.user?.password,
       vaccinationStatus: employee.vaccinationStatus,
       vaccines:
         employee.employeeVaccinations?.length > 0
