@@ -8,27 +8,26 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { EmployeeService } from '../services/employee.service';
-import { EmployeeEntity } from '../../entities';
 import {
   CreateEmployeeDto,
   FilterEmployeeDto,
   UpdateEmployeeDto,
 } from '../dtos';
 import { CreateEmployee } from '../models/create-employee.interface';
-import { Employee } from '../models/list-employees.interface';
 import { Type } from '../../constants/app.constant';
+import { EmployeeDto } from '../dtos/employee.dto';
 
 @Controller('/employees')
 export class EmployeeController {
   constructor(private readonly _employeeService: EmployeeService) {}
 
   @Get()
-  async getEmployees(): Promise<Employee[]> {
+  async getEmployees(): Promise<EmployeeDto[]> {
     return await this._employeeService.listEmployees();
   }
 
   @Get('/myInformation')
-  async myInformation(@Query('dni') dni: number): Promise<Employee> {
+  async myInformation(@Query('dni') dni: number): Promise<EmployeeDto> {
     return await this._employeeService.myInformation(dni);
   }
 
@@ -43,7 +42,7 @@ export class EmployeeController {
   @HttpCode(200)
   async filterEmployees(
     @Body() filterEmployee: FilterEmployeeDto,
-  ): Promise<{ message: string; data: Employee[] }> {
+  ): Promise<{ message: string; data: EmployeeDto[] }> {
     const employees = await this._employeeService.listEmployees(filterEmployee);
     const response = { message: 'Success', data: employees };
     return response;

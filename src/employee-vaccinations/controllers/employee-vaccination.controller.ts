@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { EmployeeVaccinationService } from '../services';
 import {
   CreateEmployeeVaccinationDto,
+  EmployeeVaccinationDto,
   UpdateEmployeeVaccinationDto,
 } from '../dtos';
 import { EmployeeVaccination } from '../models';
@@ -15,7 +16,7 @@ export class EmployeeVaccinationController {
   @Post('/create')
   async createEmployeeVaccination(
     @Body() employeeVaccination: CreateEmployeeVaccinationDto,
-  ): Promise<EmployeeVaccination> {
+  ): Promise<EmployeeVaccinationDto> {
     return await this._employeeVaccinationService.createEmployeeVaccination(
       employeeVaccination,
     );
