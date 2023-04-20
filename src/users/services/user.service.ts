@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { UserEntity } from '../../entities';
 import { Status } from '../../constants';
 import { UserException } from '../../errors/user.error';
+import { UserDto } from '../dtos';
 
 /**
  * Service to User
@@ -36,7 +37,10 @@ export class UserService {
     return await bcrypt.compare(providedPassword, storedPassword);
   }
 
-  async loginUser(username: string, providedPassword: string) {
+  async loginUser(
+    username: string,
+    providedPassword: string,
+  ): Promise<UserDto> {
     const user = await this.getUser(username);
 
     if (!user) throw new UserException('user-valid', HttpStatus.BAD_REQUEST);

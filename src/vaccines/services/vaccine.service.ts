@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { VaccineEntity } from '../../entities';
 import { Status } from '../../constants/app.constant';
+import { VaccineDto } from '../dtos/vaccine.dto';
 
 /**
  * Service to Vaccine
@@ -19,7 +20,7 @@ export class VaccineService {
     private _vaccineRepository: Repository<VaccineEntity>,
   ) {}
 
-  async getVaccines(): Promise<VaccineEntity[]> {
+  async getVaccines(): Promise<VaccineDto[]> {
     this._logger.log(Status.Active);
     const alias = VaccineEntity.ALIAS;
     return await this._vaccineRepository

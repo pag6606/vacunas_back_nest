@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -11,7 +11,6 @@ import {
   EmployeeVaccinationDto,
   UpdateEmployeeVaccinationDto,
 } from '../dtos';
-import { EmployeeVaccination } from '../models';
 
 /**
  * Service to Employee Vaccination
