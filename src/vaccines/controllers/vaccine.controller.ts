@@ -1,13 +1,20 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { VaccineService } from '../services';
-import { VaccineEntity } from '../../entities';
+import { VaccineDto } from '../dtos/vaccine.dto';
 
+@ApiTags('Vaccines')
 @Controller('/vaccines')
 export class VaccineController {
   constructor(private readonly _vaccineService: VaccineService) {}
 
   @Get()
-  async getVaccines(): Promise<VaccineEntity[]> {
+  @ApiOperation({ summary: 'Obtener todas las vacunas' })
+  @ApiOkResponse({
+    description: 'Lista de vacunas',
+    type: [VaccineDto],
+  })
+  async getVaccines(): Promise<VaccineDto[]> {
     return await this._vaccineService.getVaccines();
   }
 }

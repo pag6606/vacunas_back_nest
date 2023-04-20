@@ -1,13 +1,21 @@
 import { Controller, Get } from '@nestjs/common';
 import { RoleService } from '../services';
-import { RoleEntity } from '../../entities';
+import { RoleDto } from '../dtos';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('Roles')
 @Controller('/roles')
 export class RoleController {
   constructor(private readonly _roleService: RoleService) {}
 
+  @ApiOperation({ summary: 'Obtener todos los roles' })
+  @ApiResponse({
+    status: 200,
+    description: 'La lista de roles ha sido recuperada correctamente',
+    type: [RoleDto],
+  })
   @Get()
-  async getVaccines(): Promise<RoleEntity[]> {
+  async getVaccines(): Promise<RoleDto[]> {
     return await this._roleService.getRoles();
   }
 }

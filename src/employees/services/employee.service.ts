@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -12,14 +12,16 @@ import {
 import { Status, Type, User } from '../../constants/app.constant';
 import {
   CreateEmployeeDto,
+  DeleteEmployeeDto,
   FilterEmployeeDto,
+  ResponseCreateEmployeeDto,
+  ResponseUpdateEmployeeDto,
   UpdateEmployeeDto,
 } from '../dtos';
 import { PersonService } from '../../people/services';
 import { UserService } from '../../users/services';
 import { RoleService } from '../../roles/services';
 import { UserRoleService } from '../../user-roles/services';
-import { CreateEmployee } from '../models/create-employee.interface';
 import { validateID } from '../../utils/validateiD';
 import { EmployeeException } from '../../errors/employee.error';
 import { EmployeeDto } from '../dtos/employee.dto';
@@ -281,25 +283,28 @@ export class EmployeeService {
   async mapCreateEmployee(
     employee: EmployeeEntity,
     userrole: UserRoleEntity,
-  ): Promise<CreateEmployee> {
-    return {
-      id: employee.id,
-      dni: employee.person.dni,
-      firstName: employee.person?.firstName,
-      lastName: employee.person?.lastName,
-      birthDate: employee.birthDate,
-      homeAddress: employee.homeAddress,
-      mobilePhone: employee.mobilePhone,
-      status: employee.status === Status.Active ? 'Active' : 'Inactive',
-      username: userrole.user?.username,
-      password: userrole.user?.password,
-      role: userrole.role?.name,
-    };
+  ): Promise<ResponseCreateEmployeeDto> {
+    const createEmployee = new ResponseCreateEmployeeDto();
+
+    createEmployee.id = employee.id;
+    createEmployee.dni = employee.person.dni;
+    createEmployee.firstName = employee.person?.firstName;
+    createEmployee.lastName = employee.person?.lastName;
+    createEmployee.birthDate = employee.birthDate;
+    createEmployee.homeAddress = employee.homeAddress;
+    createEmployee.mobilePhone = employee.mobilePhone;
+    createEmployee.status =
+      employee.status === Status.Active ? 'Active' : 'Inactive';
+    createEmployee.username = userrole.user?.username;
+    createEmployee.password = userrole.user?.password;
+    createEmployee.role = userrole.role?.name;
+
+    return createEmployee;
   }
 
   async createEmploye(
     createEmployee: CreateEmployeeDto,
-  ): Promise<CreateEmployee> {
+  ): Promise<ResponseCreateEmployeeDto> {
     const existPerson = await this._personService.getPerson(createEmployee.dni);
     const existEmailEmploye = await this.getEmployee(
       null,
@@ -360,7 +365,7 @@ export class EmployeeService {
     role?: string,
     type?: string,
     updateEmployee?: UpdateEmployeeDto,
-  ) {
+  ): Promise<DeleteEmployeeDto | ResponseUpdateEmployeeDto> {
     const findEmployee = await this.getEmployee(dni);
 
     if (
@@ -369,19 +374,20 @@ export class EmployeeService {
       type === Type.DELETE &&
       role === User.ADMINISTRATOR
     ) {
+      const deleteEmployee = new DeleteEmployeeDto();
       await this._employeeRepository.update(findEmployee?.id, {
         status: Status.Inactive,
       });
 
-      return {
-        message: 'The employee has been deleted successfully',
-        id: findEmployee.id,
-        status: 'Inactive',
-        employeeName:
-          findEmployee.person.firstName + ' ' + findEmployee.person.lastName,
-        dni: findEmployee.person.dni,
-        email: findEmployee.email,
-      };
+      deleteEmployee.message = 'The employee has been deleted successfully';
+      deleteEmployee.id = findEmployee.id;
+      (deleteEmployee.status = 'Inactive'),
+        (deleteEmployee.employeeName =
+          findEmployee.person.firstName + ' ' + findEmployee.person.lastName);
+      deleteEmployee.dni = findEmployee.person.dni;
+      deleteEmployee.email = findEmployee.email;
+
+      return deleteEmployee;
     }
 
     if (dni && findEmployee && type === Type.UPDATE) {
@@ -416,10 +422,12 @@ export class EmployeeService {
 
       await this._userService.updateuser(findEmployee.user?.id, user);
 
-      return {
-        message: 'The employee has been updated successfully',
-        employee: updateEmployee,
-      };
+      const responseUpdateEmployee = new ResponseUpdateEmployeeDto();
+      responseUpdateEmployee.message =
+        'The employee has been updated successfully';
+      responseUpdateEmployee.employee = updateEmployee;
+
+      return responseUpdateEmployee;
     }
 
     throw new EmployeeException('employee-not-found', HttpStatus.BAD_REQUEST);

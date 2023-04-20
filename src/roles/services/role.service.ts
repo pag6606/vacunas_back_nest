@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { RoleEntity } from '../../entities';
 import { Status } from '../../constants';
+import { RoleDto } from '../dtos';
 
 /**
  * Service to Role
@@ -27,7 +28,7 @@ export class RoleService {
       .getOne();
   }
 
-  async getRoles(): Promise<RoleEntity[]> {
+  async getRoles(): Promise<RoleDto[]> {
     const alias = RoleEntity.ALIAS;
     return await this._roleRepository
       .createQueryBuilder(alias)
