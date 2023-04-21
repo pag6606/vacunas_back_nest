@@ -8,7 +8,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 export class RoleController {
   constructor(private readonly _roleService: RoleService) {}
 
-  @ApiOperation({ summary: 'Obtener todos los roles' })
+  @ApiOperation({ summary: 'Obtain all roles' })
   @ApiResponse({
     status: 200,
     description: 'La lista de roles ha sido recuperada correctamente',

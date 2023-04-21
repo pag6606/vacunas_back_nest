@@ -9,7 +9,7 @@ export class VaccineController {
   constructor(private readonly _vaccineService: VaccineService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Obtener todas las vacunas' })
+  @ApiOperation({ summary: 'Obtain all vaccines' })
   @ApiOkResponse({
     description: 'Lista de vacunas',
     type: [VaccineDto],
