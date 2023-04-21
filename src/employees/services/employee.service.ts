@@ -310,7 +310,7 @@ export class EmployeeService {
       null,
       createEmployee.email,
     );
-    const isValidDni = validateID(String(createEmployee.dni));
+    const isValidDni = await validateID(String(createEmployee.dni));
     const role = await this._roleService.getRole(createEmployee.role);
     const currentDay = new Date();
 
