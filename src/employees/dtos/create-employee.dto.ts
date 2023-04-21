@@ -52,7 +52,6 @@ export class CreateEmployeeDto {
 
   @ApiProperty()
   @IsOptional()
-  @IsPhoneNumber(null)
   mobilePhone: string;
 
   @ApiProperty()

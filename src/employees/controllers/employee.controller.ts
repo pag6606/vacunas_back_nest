@@ -95,8 +95,8 @@ export class EmployeeController {
   async deleteEmployee(
     @Query('dni') dni: number,
     @Query('role') role: string,
-  ): Promise<DeleteEmployeeDto | ResponseUpdateEmployeeDto> {
-    return await this._employeeService.updateEmployee(dni, role, Type.DELETE);
+  ): Promise<DeleteEmployeeDto> {
+    return await this._employeeService.deleteEmployee(dni, role);
   }
 
   @ApiOperation({ summary: 'Update an employee' })
@@ -113,12 +113,7 @@ export class EmployeeController {
   async updateEmployee(
     @Query('dni') dni: number,
     @Body() updateEmployee: UpdateEmployeeDto,
-  ): Promise<DeleteEmployeeDto | ResponseUpdateEmployeeDto> {
-    return await this._employeeService.updateEmployee(
-      dni,
-      null,
-      Type.UPDATE,
-      updateEmployee,
-    );
+  ): Promise<ResponseUpdateEmployeeDto> {
+    return await this._employeeService.updateEmployee(dni, updateEmployee);
   }
 }

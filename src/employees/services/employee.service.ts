@@ -360,24 +360,26 @@ export class EmployeeService {
     return await this.mapCreateEmployee(savedEmployee, savedUserRole);
   }
 
-  async updateEmployee(
-    dni: number,
-    role?: string,
-    type?: string,
-    updateEmployee?: UpdateEmployeeDto,
-  ): Promise<DeleteEmployeeDto | ResponseUpdateEmployeeDto> {
+  async deleteEmployee(dni: number, role?: string): Promise<DeleteEmployeeDto> {
     const findEmployee = await this.getEmployee(dni);
 
-    if (
-      dni &&
-      findEmployee &&
-      type === Type.DELETE &&
-      role === User.ADMINISTRATOR
-    ) {
+    if (role !== User.ADMINISTRATOR)
+      throw new EmployeeException('not-access', HttpStatus.BAD_REQUEST);
+    if (!findEmployee)
+      throw new EmployeeException('employee-not-found', HttpStatus.BAD_REQUEST);
+
+    if (dni && findEmployee) {
       const deleteEmployee = new DeleteEmployeeDto();
+      const person = new PersonEntity();
+      const user = new UserEntity();
+      person.status = Status.Inactive;
+      user.status = Status.Inactive;
+
       await this._employeeRepository.update(findEmployee?.id, {
         status: Status.Inactive,
       });
+      await this._personService.updatePerson(findEmployee?.person?.id, person);
+      await this._userService.updateuser(findEmployee?.user?.id, user);
 
       deleteEmployee.message = 'The employee has been deleted successfully';
       deleteEmployee.id = findEmployee.id;
@@ -389,8 +391,18 @@ export class EmployeeService {
 
       return deleteEmployee;
     }
+  }
 
-    if (dni && findEmployee && type === Type.UPDATE) {
+  async updateEmployee(
+    dni: number,
+    updateEmployee: UpdateEmployeeDto,
+  ): Promise<ResponseUpdateEmployeeDto> {
+    const findEmployee = await this.getEmployee(dni);
+
+    if (!findEmployee)
+      throw new EmployeeException('employee-not-found', HttpStatus.BAD_REQUEST);
+
+    if (dni && findEmployee) {
       const employee = new EmployeeEntity();
       employee.birthDate = updateEmployee.birthDate;
       employee.email = updateEmployee.email;
@@ -410,7 +422,7 @@ export class EmployeeService {
 
       const user = new UserEntity();
 
-      if (updateEmployee.password) {
+      if (updateEmployee?.password) {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(user.password, saltRounds);
         user.password = hashedPassword;
@@ -429,7 +441,5 @@ export class EmployeeService {
 
       return responseUpdateEmployee;
     }
-
-    throw new EmployeeException('employee-not-found', HttpStatus.BAD_REQUEST);
   }
 }
