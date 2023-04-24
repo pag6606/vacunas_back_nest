@@ -3,7 +3,7 @@ export abstract class Status {
   static Active = '1';
 }
 
-export abstract class User {
+export abstract class Role {
   static ADMINISTRATOR = 'Administrator';
   static EMPLOYEE = 'Employee';
 }

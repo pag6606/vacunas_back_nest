@@ -51,6 +51,7 @@ export class EmployeeVaccinationService {
       null,
       null,
       employeeId,
+      true,
     );
     const vaccine = await this._vaccineService.getVaccine(vaccineId);
 

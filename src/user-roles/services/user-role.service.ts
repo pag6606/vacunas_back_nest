@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { UserRoleEntity } from '../../entities';
@@ -20,5 +20,12 @@ export class UserRoleService {
 
   async createUserRole(userRole: UserRoleEntity): Promise<UserRoleEntity> {
     return await this._userRoleRepository.save(userRole);
+  }
+
+  async updateUserRole(
+    userRoleId: number,
+    userRole: UserRoleEntity,
+  ): Promise<UpdateResult> {
+    return await this._userRoleRepository.update(userRoleId, userRole);
   }
 }

@@ -13,6 +13,11 @@ export class UpdateEmployeeDto extends PartialType(CreateEmployeeDto) {
   @IsOptional()
   @IsString()
   username: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  status: string;
 }
 
 export class ResponseUpdateEmployeeDto {

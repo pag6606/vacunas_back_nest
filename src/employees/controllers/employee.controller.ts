@@ -112,8 +112,13 @@ export class EmployeeController {
   @Patch('/update')
   async updateEmployee(
     @Query('dni') dni: number,
+    @Query('role') role: string,
     @Body() updateEmployee: UpdateEmployeeDto,
   ): Promise<ResponseUpdateEmployeeDto> {
-    return await this._employeeService.updateEmployee(dni, updateEmployee);
+    return await this._employeeService.updateEmployee(
+      dni,
+      updateEmployee,
+      role,
+    );
   }
 }
