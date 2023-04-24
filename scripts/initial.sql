@@ -13,7 +13,7 @@ CREATE TABLE vaccination_registry.person (
     id INTEGER PRIMARY KEY DEFAULT nextval('vaccination_registry.person_id_seq'),
     first_name VARCHAR NOT NULL,
     last_name VARCHAR NOT NULL,
-    dni NUMERIC(10) UNIQUE,
+    dni NUMERIC(10) NOT NULL,
     status VARCHAR DEFAULT '1',
     created_date DATE,
     last_modified_date DATE
@@ -22,7 +22,7 @@ CREATE TABLE vaccination_registry.person (
 CREATE TABLE vaccination_registry.employee (
     id INTEGER PRIMARY KEY DEFAULT nextval('vaccination_registry.employee_id_seq'),
     person_id INTEGER REFERENCES vaccination_registry.person(id),
-    email VARCHAR UNIQUE NOT NULL,
+    email VARCHAR NOT NULL,
     birth_date DATE,
     home_address VARCHAR,
     mobile_phone VARCHAR,
@@ -54,7 +54,7 @@ CREATE TABLE vaccination_registry.employee_vaccination (
 CREATE TABLE vaccination_registry.user (
     id INTEGER PRIMARY KEY DEFAULT nextval('vaccination_registry.user_id_seq'),
     employee_id INTEGER REFERENCES vaccination_registry.employee(id),
-    username VARCHAR UNIQUE NOT NULL,
+    username VARCHAR NOT NULL,
     password VARCHAR NOT NULL,
     status VARCHAR DEFAULT '1',
     created_date DATE,

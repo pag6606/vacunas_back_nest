@@ -25,6 +25,8 @@ export class UserService {
     const alias = UserEntity.ALIAS;
     return await this._userRepository
       .createQueryBuilder(alias)
+      .leftJoinAndSelect(`${alias}.userRoles`, 'userRoles')
+      .leftJoinAndSelect('userRoles.role', 'role')
       .where(`${alias}.status = '${Status.Active}'`)
       .andWhere(`${alias}.username =:username`, { username })
       .getOne();
@@ -41,6 +43,7 @@ export class UserService {
     username: string,
     providedPassword: string,
   ): Promise<UserDto> {
+    const responseUser = new UserDto();
     const user = await this.getUser(username);
 
     if (!user) throw new UserException('user-valid', HttpStatus.BAD_REQUEST);
@@ -53,7 +56,17 @@ export class UserService {
     if (!isValid)
       throw new UserException('username-password', HttpStatus.BAD_REQUEST);
 
-    return user;
+    responseUser.id = user.id;
+    responseUser.username = user.username;
+    responseUser.password = user.password;
+    responseUser.status = user.status;
+    responseUser.createdDate = user.createdDate;
+    responseUser.lastModifiedDate = user.lastModifiedDate;
+    responseUser.roles = user.userRoles.map((userRole) => {
+      return { id: userRole.role?.id, name: userRole.role?.name };
+    });
+
+    return responseUser;
   }
 
   async createUser(user: UserEntity): Promise<UserEntity> {
