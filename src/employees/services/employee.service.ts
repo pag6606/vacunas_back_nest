@@ -264,6 +264,10 @@ export class EmployeeService {
 
   async myInformation(dni: number): Promise<EmployeeDto> {
     const employee = await this.getEmployee(dni, null, null, true);
+
+    if (!employee)
+      throw new EmployeeException('employee-not-found', HttpStatus.BAD_REQUEST);
+
     const employeeDto = new EmployeeDto();
 
     employeeDto.id = employee.id;
@@ -331,7 +335,7 @@ export class EmployeeService {
       null,
       true,
     );
-    const isValidDni = await validateID(String(createEmployee.dni));
+    //const isValidDni = await validateID(String(createEmployee.dni)); //descoment
     const role = await this._roleService.getRole(createEmployee.role);
     const currentDay = new Date();
 
@@ -343,9 +347,9 @@ export class EmployeeService {
 
     if (existEmailEmploye)
       throw new EmployeeException('email-exist', HttpStatus.BAD_REQUEST);
-
-    if (!isValidDni)
-      throw new EmployeeException('invalid-dni', HttpStatus.BAD_REQUEST);
+    //descoment
+    /* if (!isValidDni)
+      throw new EmployeeException('invalid-dni', HttpStatus.BAD_REQUEST); */
 
     const person = new PersonEntity();
     person.dni = createEmployee.dni;
