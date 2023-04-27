@@ -335,7 +335,7 @@ export class EmployeeService {
       null,
       true,
     );
-    const isValidDni = await validateID(String(createEmployee.dni));
+    // const isValidDni = await validateID(String(createEmployee.dni));
     const role = await this._roleService.getRole(createEmployee.role);
     const currentDay = new Date();
 
@@ -348,8 +348,8 @@ export class EmployeeService {
     if (existEmailEmploye)
       throw new EmployeeException('email-exist', HttpStatus.BAD_REQUEST);
 
-    if (!isValidDni)
-      throw new EmployeeException('invalid-dni', HttpStatus.BAD_REQUEST);
+    // if (!isValidDni)
+    //   throw new EmployeeException('invalid-dni', HttpStatus.BAD_REQUEST);
 
     const person = new PersonEntity();
     person.dni = createEmployee.dni;

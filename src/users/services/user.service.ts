@@ -27,6 +27,8 @@ export class UserService {
       .createQueryBuilder(alias)
       .leftJoinAndSelect(`${alias}.userRoles`, 'userRoles')
       .leftJoinAndSelect('userRoles.role', 'role')
+      .leftJoinAndSelect(`${alias}.employee`, 'employee')
+      .leftJoinAndSelect('employee.person', 'person')
       .where(`${alias}.status = '${Status.Active}'`)
       .andWhere(`${alias}.username =:username`, { username })
       .getOne();
@@ -62,6 +64,7 @@ export class UserService {
     responseUser.status = user.status;
     responseUser.createdDate = user.createdDate;
     responseUser.lastModifiedDate = user.lastModifiedDate;
+    responseUser.dni = user.employee.person.dni;
     responseUser.roles = user.userRoles.map((userRole) => {
       return { id: userRole.role?.id, name: userRole.role?.name };
     });

@@ -27,4 +27,6 @@ export class UserDto {
   lastModifiedDate: Date;
 
   roles: RoleDto[];
+
+  dni: number;
 }
