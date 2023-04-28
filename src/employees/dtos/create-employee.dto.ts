@@ -5,7 +5,6 @@ import {
   Length,
   Matches,
   IsOptional,
-  IsPhoneNumber,
   IsBoolean,
   IsDateString,
 } from 'class-validator';
@@ -52,7 +51,6 @@ export class CreateEmployeeDto {
 
   @ApiProperty()
   @IsOptional()
-  @IsPhoneNumber(null)
   mobilePhone: string;
 
   @ApiProperty()

@@ -9,7 +9,7 @@ import {
   UserEntity,
   UserRoleEntity,
 } from '../../entities';
-import { Status, Type, User } from '../../constants/app.constant';
+import { Status, Type, Role } from '../../constants/app.constant';
 import {
   CreateEmployeeDto,
   DeleteEmployeeDto,
@@ -193,47 +193,66 @@ export class EmployeeService {
     dni?: number,
     email?: string,
     employeeId?: number,
+    isActive?: boolean,
   ): Promise<EmployeeEntity> {
     const alias = EmployeeEntity.ALIAS;
-    const employee = this._employeeRepository
-      .createQueryBuilder(alias)
-      .leftJoinAndSelect(
-        `${alias}.person`,
-        'person',
-        'person.status =:status',
-        { status: Status.Active },
-      )
-      .leftJoinAndSelect(`${alias}.user`, 'user', 'user.status =:status', {
-        status: Status.Active,
-      })
-      .leftJoinAndSelect(
-        `${alias}.employeeVaccinations`,
-        'employeeVaccinations',
-        'employeeVaccinations.status =:status',
-        {
+    const employee = this._employeeRepository.createQueryBuilder(alias);
+
+    const addActiveStatus = isActive && isActive === true;
+
+    if (addActiveStatus) {
+      employee
+        .leftJoinAndSelect(
+          `${alias}.person`,
+          'person',
+          'person.status =:status',
+          { status: Status.Active },
+        )
+        .leftJoinAndSelect(`${alias}.user`, 'user', 'user.status =:status', {
           status: Status.Active,
-        },
-      )
-      .leftJoinAndSelect(
-        'employeeVaccinations.vaccine',
-        'vaccine',
-        'vaccine.status =:status',
-        {
+        })
+        .leftJoinAndSelect(
+          `${alias}.employeeVaccinations`,
+          'employeeVaccinations',
+          'employeeVaccinations.status =:status',
+          {
+            status: Status.Active,
+          },
+        )
+        .leftJoinAndSelect(
+          'employeeVaccinations.vaccine',
+          'vaccine',
+          'vaccine.status =:status',
+          {
+            status: Status.Active,
+          },
+        )
+        .leftJoinAndSelect(
+          'user.userRoles',
+          'userRoles',
+          'userRoles.status =:status',
+          {
+            status: Status.Active,
+          },
+        )
+        .leftJoinAndSelect('userRoles.role', 'role', 'role.status =:status', {
           status: Status.Active,
-        },
-      )
-      .leftJoinAndSelect(
-        'user.userRoles',
-        'userRoles',
-        'userRoles.status =:status',
-        {
+        })
+        .where(`${alias}.status =:status`, {
           status: Status.Active,
-        },
-      )
-      .leftJoinAndSelect('userRoles.role', 'role', 'role.status =:status', {
-        status: Status.Active,
-      })
-      .where(`${alias}.status =:status`, { status: Status.Active });
+        });
+    } else {
+      employee
+        .leftJoinAndSelect(`${alias}.person`, 'person')
+        .leftJoinAndSelect(`${alias}.user`, 'user')
+        .leftJoinAndSelect(
+          `${alias}.employeeVaccinations`,
+          'employeeVaccinations',
+        )
+        .leftJoinAndSelect('employeeVaccinations.vaccine', 'vaccine')
+        .leftJoinAndSelect('user.userRoles', 'userRoles')
+        .leftJoinAndSelect('userRoles.role', 'role');
+    }
 
     if (dni) employee.andWhere('person.dni =:dni', { dni });
     if (email) employee.andWhere(`${alias}.email =:email`, { email });
@@ -244,7 +263,11 @@ export class EmployeeService {
   }
 
   async myInformation(dni: number): Promise<EmployeeDto> {
-    const employee = await this.getEmployee(dni);
+    const employee = await this.getEmployee(dni, null, null, true);
+
+    if (!employee)
+      throw new EmployeeException('employee-not-found', HttpStatus.BAD_REQUEST);
+
     const employeeDto = new EmployeeDto();
 
     employeeDto.id = employee.id;
@@ -309,10 +332,15 @@ export class EmployeeService {
     const existEmailEmploye = await this.getEmployee(
       null,
       createEmployee.email,
+      null,
+      true,
     );
-    const isValidDni = validateID(String(createEmployee.dni));
+    // const isValidDni = await validateID(String(createEmployee.dni));
     const role = await this._roleService.getRole(createEmployee.role);
     const currentDay = new Date();
+
+    if (existPerson && !existEmailEmploye)
+      throw new EmployeeException('inactive-employee', HttpStatus.BAD_REQUEST);
 
     if (existPerson)
       throw new EmployeeException('dni-exist', HttpStatus.BAD_REQUEST);
@@ -320,8 +348,8 @@ export class EmployeeService {
     if (existEmailEmploye)
       throw new EmployeeException('email-exist', HttpStatus.BAD_REQUEST);
 
-    if (!isValidDni)
-      throw new EmployeeException('invalid-dni', HttpStatus.BAD_REQUEST);
+    // if (!isValidDni)
+    //   throw new EmployeeException('invalid-dni', HttpStatus.BAD_REQUEST);
 
     const person = new PersonEntity();
     person.dni = createEmployee.dni;
@@ -360,24 +388,23 @@ export class EmployeeService {
     return await this.mapCreateEmployee(savedEmployee, savedUserRole);
   }
 
-  async updateEmployee(
-    dni: number,
-    role?: string,
-    type?: string,
-    updateEmployee?: UpdateEmployeeDto,
-  ): Promise<DeleteEmployeeDto | ResponseUpdateEmployeeDto> {
-    const findEmployee = await this.getEmployee(dni);
+  async deleteEmployee(dni: number, role?: string): Promise<DeleteEmployeeDto> {
+    const findEmployee = await this.getEmployee(dni, null, null, true);
 
-    if (
-      dni &&
-      findEmployee &&
-      type === Type.DELETE &&
-      role === User.ADMINISTRATOR
-    ) {
+    if (role !== Role.ADMINISTRATOR)
+      throw new EmployeeException('not-access', HttpStatus.BAD_REQUEST);
+    if (!findEmployee)
+      throw new EmployeeException('employee-not-found', HttpStatus.BAD_REQUEST);
+
+    if (dni && findEmployee) {
       const deleteEmployee = new DeleteEmployeeDto();
       await this._employeeRepository.update(findEmployee?.id, {
         status: Status.Inactive,
       });
+
+      const user = new UserEntity();
+      user.status = Status.Inactive;
+      await this._userService.updateuser(findEmployee?.user?.id, user);
 
       deleteEmployee.message = 'The employee has been deleted successfully';
       deleteEmployee.id = findEmployee.id;
@@ -389,8 +416,24 @@ export class EmployeeService {
 
       return deleteEmployee;
     }
+  }
 
-    if (dni && findEmployee && type === Type.UPDATE) {
+  async updateEmployee(
+    dni: number,
+    updateEmployee: UpdateEmployeeDto,
+    role?: string,
+  ): Promise<ResponseUpdateEmployeeDto> {
+    const findEmployee = await this.getEmployee(
+      dni,
+      null,
+      null,
+      !updateEmployee?.status ? true : false,
+    );
+
+    if (!findEmployee)
+      throw new EmployeeException('employee-not-found', HttpStatus.BAD_REQUEST);
+
+    if (dni && findEmployee) {
       const employee = new EmployeeEntity();
       employee.birthDate = updateEmployee.birthDate;
       employee.email = updateEmployee.email;
@@ -398,19 +441,20 @@ export class EmployeeService {
       employee.mobilePhone = updateEmployee.mobilePhone;
       employee.vaccinationStatus = updateEmployee.vaccinationStatus;
 
-      await this._employeeRepository.update(findEmployee.id, employee);
-
       const person = new PersonEntity();
       const isValidDni = validateID(String(updateEmployee?.dni));
       isValidDni ? (person.dni = updateEmployee.dni) : null;
       person.firstName = updateEmployee.firstName;
       person.lastName = updateEmployee.lastName;
 
-      await this._personService.updatePerson(findEmployee.person?.id, person);
-
       const user = new UserEntity();
 
-      if (updateEmployee.password) {
+      if (updateEmployee?.status && role === Role.ADMINISTRATOR) {
+        employee.status = updateEmployee.status;
+        user.status = updateEmployee.status;
+      }
+
+      if (updateEmployee?.password) {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(user.password, saltRounds);
         user.password = hashedPassword;
@@ -420,6 +464,8 @@ export class EmployeeService {
         ? updateEmployee.email
         : updateEmployee.username;
 
+      await this._employeeRepository.update(findEmployee.id, employee);
+      await this._personService.updatePerson(findEmployee.person?.id, person);
       await this._userService.updateuser(findEmployee.user?.id, user);
 
       const responseUpdateEmployee = new ResponseUpdateEmployeeDto();
@@ -429,7 +475,5 @@ export class EmployeeService {
 
       return responseUpdateEmployee;
     }
-
-    throw new EmployeeException('employee-not-found', HttpStatus.BAD_REQUEST);
   }
 }

@@ -9,6 +9,8 @@ const statusMessages: HttpStatusMessageMap = {
   ['email-exist']: 'The email you are trying to register already exists',
   ['dni-exist']: 'The DNI you are trying to register already exists',
   ['employee-not-found']: 'The employee you want to delete was not found',
+  ['not-access']: 'Sorry but you do not have permission to perform this action',
+  ['inactive-employee']: `I can't create the employee, because it already exists, but it has inactive status, if you want to continue please activate the employee`,
 };
 
 export class EmployeeException extends HttpException {

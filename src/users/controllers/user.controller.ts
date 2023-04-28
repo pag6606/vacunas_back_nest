@@ -10,7 +10,7 @@ export class UserController {
   constructor(private readonly _userService: UserService) {}
 
   @Get('/login')
-  @ApiOperation({ summary: 'Iniciar sesión' })
+  @ApiOperation({ summary: 'Log in' })
   @ApiQuery({
     name: 'username',
     description: 'Nombre de usuario',

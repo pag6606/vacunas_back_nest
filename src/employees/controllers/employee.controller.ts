@@ -11,6 +11,7 @@ import {
   ApiBody,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -71,6 +72,11 @@ export class EmployeeController {
     type: FilterEmployeeDto,
     description: 'Filter criteria for employees',
   })
+  @ApiResponse({
+    status: 200,
+    type: [EmployeeDto],
+    description: 'Filter Employee object',
+  })
   @Post('/filter')
   async filterEmployees(
     @Body() filterEmployee: FilterEmployeeDto,
@@ -89,20 +95,30 @@ export class EmployeeController {
   async deleteEmployee(
     @Query('dni') dni: number,
     @Query('role') role: string,
-  ): Promise<DeleteEmployeeDto | ResponseUpdateEmployeeDto> {
-    return await this._employeeService.updateEmployee(dni, role, Type.DELETE);
+  ): Promise<DeleteEmployeeDto> {
+    return await this._employeeService.deleteEmployee(dni, role);
   }
 
+  @ApiOperation({ summary: 'Update an employee' })
+  @ApiOkResponse({
+    type: ResponseUpdateEmployeeDto,
+    description: 'Update an employee in the database',
+  })
+  @ApiQuery({
+    name: 'dni',
+    description: 'Employee Identification',
+    type: Number,
+  })
   @Patch('/update')
   async updateEmployee(
     @Query('dni') dni: number,
+    @Query('role') role: string,
     @Body() updateEmployee: UpdateEmployeeDto,
-  ): Promise<DeleteEmployeeDto | ResponseUpdateEmployeeDto> {
+  ): Promise<ResponseUpdateEmployeeDto> {
     return await this._employeeService.updateEmployee(
       dni,
-      null,
-      Type.UPDATE,
       updateEmployee,
+      role,
     );
   }
 }
